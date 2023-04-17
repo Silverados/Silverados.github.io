@@ -4,8 +4,4 @@
 >
 > Silvers的初衷是当时听过一句话叫做：years will silver your hair。觉得很美就想到了这网名。
 
-  <span id="busuanzi_container_site_pv" style='display:none'>
-    👀 本站总访问量:<span id="busuanzi_value_site_pv"></span> 次 | 🚴 本站总访客数:<span id="busuanzi_value_site_uv"></span> 人 | 本页总访问量<span id="busuanzi_value_page_pv"></span>次
-  </span>
-
-  <span id="busuanzi_container_site_pv" style='display:none'> 👀 本站总访问量:<span id="busuanzi_value_site_pv"></span> 次 | 🚴 本站总访客数:<span id="busuanzi_value_site_uv"></span> 人 | 本页总访问量<span id="busuanzi_value_page_pv"></span>次</span>
+更好的浏览体验： [https://silverados.github.io/](https://silverados.github.io/)
