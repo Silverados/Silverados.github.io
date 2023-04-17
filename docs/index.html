@@ -42,8 +42,9 @@
           hook.beforeEach(function (html) {
             return html +
               '\n\n----\n\n' +
-              '<a href="https://docsify.js.org" target="_blank" style="color: inherit; font-weight: normal; text-decoration: none;">Powered by <span style="color:green;text-decoration:underline;">docsify</span></a>'
-              + '<em style="float: right">上次更新于: {docsify-updated} </em>'
+              '<span id="busuanzi_container_site_pv" style="display:none"> 👀 本站总访问量:<span id="busuanzi_value_site_pv"></span> 次 | 🙆‍♂️本站总访客数:<span id="busuanzi_value_site_uv"></span> 人 | 🤔本页总访问量<span id="busuanzi_value_page_pv"></span>次</span>'
+                + '<em style="float: right">上次更新于: {docsify-updated} </em>'
+                +'<div><a href="https://docsify.js.org" target="_blank" style="color: inherit; font-weight: normal; text-decoration: none;">Powered by <span style="color:green;text-decoration:underline;">docsify</span></a></div>'
           })
         },
       ],
