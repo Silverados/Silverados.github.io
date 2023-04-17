@@ -7,4 +7,5 @@
 * AI
     * [IDEA使用AWS CodeWhisperer](/ai/IDEA使用CodeWhisperer.md "IDEA使用AWS CodeWhisperer | Silverados") 
 * 杂项
+    * [Github](/misc/github_contribution_activity.md "Github中Contribution activity不展示commit | Silverados")
 * 运维
