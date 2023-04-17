@@ -11,16 +11,29 @@
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
   <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8095866800125730"
     crossorigin="anonymous"></script> -->
+
+  <!--google analytics-->
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-7GVW1LW7MP"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'G-7GVW1LW7MP');
+  </script>
 </head>
 
 <body>
   <div id="app"></div>
+  <span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次</span>
   <script>
     window.$docsify = {
-      name: '',
-      repo: 'https://github.com/Silverados/Silverados.github.io/tree/main/docs',
+      name: 'Silverados',
+      repo: 'https://github.com/Silverados/Silverados.github.io/tree/main',
       loadSidebar: true,
       subMaxLevel: 2,
+      externalLinkTarget: '_blank', //外链打开方式：_blank表示在新标签页中打开
       alias: {
         '/.*/_navbar.md': '/_navbar.md',
       },
@@ -56,6 +69,7 @@
   <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-java.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-markdown.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 </body>
 
 </html>
