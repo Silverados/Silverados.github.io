@@ -190,7 +190,7 @@ private static final int DEFAULT_CAPACITY = 10;
     }
 ```
 
-`fastRemove`中`System.arraycopy`使用原数组直接进行了位移，将目标后的元素向前位移一格，但是不会改变数组的容量。
+`fastRemove`中`System.arraycopy`使用原数组直接进行了复制，将目标后的元素向前位移一格，但是不会改变数组的容量。
 
 
 ## 迭代中增删元素
