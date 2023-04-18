@@ -12,20 +12,8 @@
   <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8095866800125730"
     crossorigin="anonymous"></script> -->
 
-  <!--google analytics-->
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-7GVW1LW7MP"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-
-    function gtag() {
-      dataLayer.push(arguments);
-    }
-
-    gtag('js', new Date());
-
-    gtag('config', 'G-7GVW1LW7MP');
-  </script>
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/docsify.min.js" data-ga="G-7GVW1LW7MP"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/ga.min.js"></script>
 </head>
 
 <body>
@@ -48,19 +36,23 @@
           var url = 'https://github.com/Silverados/Silverados.github.io/blob/main/docs/' + vm.route.file;
           var editHtml = '[📝 EDIT DOCUMENT](' + url + ')\n';
 
+          var lastUpdated = '{docsify-updated}'
+          var updateUrl = 'https://api.github.com/repos/Silverados/Silverados.github.io/commits?path=docs/' + vm.route.file + '&per_page=1'
+          fetch(updateUrl)
+            .then(response => response.json())
+            .then(data => {
+              lastUpdated = new Date(data[0].commit.author.date);
+            });
+
           return (
             editHtml +
             html +
             '\n----\n' +
             '<span id="busuanzi_container_site_pv" style="display:none"> 🙆‍♂️本站总访客数:<span id="busuanzi_value_site_uv"></span> 人</span>\n' +
-            '<em style="float: right">上次更新于: {docsify-updated} </em>' +
+            '<em style="float: right">上次更新于: ' + lastUpdated + '</em>' +
             '<div><a href="https://docsify.js.org" target="_blank" style="color: inherit; font-weight: normal; text-decoration: none;">Powered by <span style="color:green;text-decoration:underline;">docsify</span></a></div>'
           );
         });
-
-        hook.afterEach(function (html, next) {
-          next(html);
-        })
       },
     ],
     // docsify-copy-code (defaults)
