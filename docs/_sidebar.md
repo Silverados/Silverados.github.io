@@ -4,6 +4,7 @@
 * Java
     * 数据结构
 		* [ArrayList](/java/datastructure/ArrayList.md "ArrayList详解 | Silverados")
+        * [HashMap](/java/datastructure/HashMap.md "HashMap详解 | Silverados")
 * AI
     * [IDEA使用AWS CodeWhisperer](/ai/IDEA使用CodeWhisperer.md "IDEA使用AWS CodeWhisperer | Silverados") 
 * 杂项
