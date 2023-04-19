@@ -21,9 +21,9 @@ public class HashMap<K,V> extends AbstractMap<K,V>
 - public HashMap(Map<? extends K, ? extends V> m)
 
 分析前3个方法的实现可以发现构造方法主要做的是:对`loadFactor`赋值、对`threshold`赋值。如果没传入值`loadFactor`使用`DEFAULT_LOAD_FACTOR`。
-第4个方法在这个基础上对传入的参数`m`进行分析得到`threshold`，`loadFactor`同样使用默认值。
-这个地方会用`tableSizeFor`将传入的容量变成2的N次方。
-在随后的容量分析中我们会看到，默认使用的容量大小为16，扩容因子为0.75，扩容阈值为16*0.75=12.
+第4个方法在这个基础上对传入的参数`Map<K, V> m`先设置`loadFactor`为默认值, 然后通常情况下是将`tableSizeFor(m.size / loadFactor + 1)`进行分析得到`threshold`, 例如我m的大小是20，得到的值为32。
+这个地方用到的`tableSizeFor`是将传入的容量变成2的N次方。
+在随后的容量分析中我们会看到，默认使用的容量大小为16，扩容因子为0.75，扩容阈值`threshold`为16*0.75=12.
 ```java
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
     static final int DEFAULT_INITIAL_CAPACITY = 1 << 4; // aka 16
@@ -63,7 +63,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
         return (n < 0) ? 1 : (n >= MAXIMUM_CAPACITY) ? MAXIMUM_CAPACITY : n + 1;
     }
 ```
-例如`cap`为5, 对应的二进制为`101`,整型有32位, 那么前导0个数为29,`-1`的二进制为32位的1,带符号右移29位得到`1000`即8。
+例如`cap`为5, 对应的二进制为`101`,整型有32位, 那么前导0个数为29,`-1`的二进制为32位的1,带符号右移29位后+1得到`1000`即8。
 
 ## 数组容量大小相关
 我们从上面的构造方法中没有看出来数组被初始化，那么就要联想到在具体使用的时候会进行初始化。 先来看看`put`中和数组容量有关的实现：

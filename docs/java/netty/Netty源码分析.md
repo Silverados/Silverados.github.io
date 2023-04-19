@@ -27,6 +27,126 @@ Channel可以有父Channel，具体取决于其创建方式。例如，被`Serve
 
 
 
+## ChannelPipeline
+
+一系列`ChannelHandler`处理`Channel`的入站事件和出站事件。`ChannelPipeline`实现和拦截过滤器模式，给用户提供完全的控制事件怎么被处理和`Channel`之间怎么交互。
+
+### 创建管道
+
+每个通道都有自己的管道，并在创建新通道时自动创建。
+
+### 事件在管道中的流动方式
+
+下图描述了ChannelPipeline 通常如何处理 I/O 事件ChannelHandler。I/O 事件由 或 ChannelInboundHandler 处理ChannelOutboundHandler，并通过调用 中ChannelHandlerContext定义的事件传播方法（如 ChannelHandlerContext.fireChannelRead(Object) 和 ChannelHandlerContext.write(Object)）转发到最近的处理程序。
+
+![image-20230411151649907](C:\Users\QTZ\AppData\Roaming\Typora\typora-user-images\image-20230411151649907.png)
+
+
+
+入站事件由入站处理程序以自下而上的方向处理，如关系图左侧所示。入站处理程序通常处理由关系图底部的 I/O 线程生成的入站数据。入站数据通常通过实际输入操作从远程对等方读取，例如 SocketChannel.read(ByteBuffer)。如果入站事件超出顶级入站处理程序，则会以静默方式丢弃该事件，或者在需要您注意时记录该事件。
+出站事件由出站处理程序按自上而下的方向处理，如关系图右侧所示。出站处理程序通常会生成或转换出站流量，例如写入请求。如果出站事件超出底部出站处理程序，则由与 关联的 ChannelI/O 线程处理。I/O 线程通常执行实际的输出操作，例如 SocketChannel.write(ByteBuffer)。
+例如，假设我们创建了以下管道：
+
+```java
+  ChannelPipeline p = ...;
+  p.addLast("1", new InboundHandlerA());
+  p.addLast("2", new InboundHandlerB());
+  p.addLast("3", new OutboundHandlerA());
+  p.addLast("4", new OutboundHandlerB());
+  p.addLast("5", new InboundOutboundHandlerX());
+```
+
+在上面的示例中，名称以 开头的 Inbound 类表示它是一个入站处理程序。名称以 开头的 Outbound 类表示它是一个出站处理程序。
+在给定的示例配置中，当事件入站时，处理程序评估顺序为 1、2、3、4、5。当事件出站时，顺序为 5、4、3、2、1。在此原则之上， ChannelPipeline 跳过某些处理程序的评估以缩短堆栈深度：
+3 和 4 不实现 ChannelInboundHandler，因此入站事件的实际求值顺序为：1、2 和 5。
+1 和 2 不实现 ChannelOutboundHandler，因此出站事件的实际求值顺序为：5、4 和 3。
+如果 5 同时实现 ChannelInboundHandler 和 ChannelOutboundHandler，则入站事件和出站事件的求值顺序可能分别为 125 和543。
+
+### 将事件转发到下一个处理程序
+
+正如您可能在图中注意到的那样，处理程序必须调用事件传播方法 ChannelHandlerContext 才能将事件转发到其下一个处理程序。这些方法包括：
+入站事件传播方法：
+
+```
+ChannelHandlerContext.fireChannelRegistered()
+ChannelHandlerContext.fireChannelActive()
+ChannelHandlerContext.fireChannelRead(Object)
+ChannelHandlerContext.fireChannelReadComplete()
+ChannelHandlerContext.fireExceptionCaught(Throwable)
+ChannelHandlerContext.fireUserEventTriggered(Object)
+ChannelHandlerContext.fireChannelWritabilityChanged()
+ChannelHandlerContext.fireChannelInactive()
+ChannelHandlerContext.fireChannelUnregistered()
+```
+
+出站事件传播方法：
+
+```
+ChannelHandlerContext.bind(SocketAddress, ChannelPromise)
+ChannelHandlerContext.connect(SocketAddress, SocketAddress, ChannelPromise)
+ChannelHandlerContext.write(Object, ChannelPromise)
+ChannelHandlerContext.flush()
+ChannelHandlerContext.read()
+ChannelHandlerContext.disconnect(ChannelPromise)
+ChannelHandlerContext.close(ChannelPromise)
+ChannelHandlerContext.deregister(ChannelPromise)
+```
+
+以下示例显示了通常如何完成事件传播：
+
+```
+  public class MyInboundHandler extends ChannelInboundHandlerAdapter {
+      @Override
+      public void channelActive(ChannelHandlerContext ctx) {
+          System.out.println("Connected!");
+          ctx.fireChannelActive();
+      }
+  }
+
+  public class MyOutboundHandler extends ChannelOutboundHandlerAdapter {
+      @Override
+      public void close(ChannelHandlerContext ctx, ChannelPromise promise) {
+          System.out.println("Closing ..");
+          ctx.close(promise);
+      }
+  }
+```
+
+### 构建管道
+
+用户应该在管道中有一个或多个 ChannelHandler来接收 I/O 事件（例如读取）和请求 I/O 操作（例如写入和关闭）。例如，典型的服务器在每个通道的管道中具有以下处理程序，但您的里程可能会因协议和业务逻辑的复杂性和特征而异：
+协议解码器 - 将二进制数据（例如 ByteBuf）转换为Java对象。
+协议编码器 - 将 Java 对象转换为二进制数据。
+业务逻辑处理程序 - 执行实际的业务逻辑（例如数据库访问）。
+它可以表示如下例所示：
+
+```
+  static final EventExecutorGroup group = new DefaultEventExecutorGroup(16);
+  ...
+
+  ChannelPipeline pipeline = ch.pipeline();
+
+  pipeline.addLast("decoder", new MyProtocolDecoder());
+  pipeline.addLast("encoder", new MyProtocolEncoder());
+
+  // Tell the pipeline to run MyBusinessLogicHandler's event handler methods
+  // in a different thread than an I/O thread so that the I/O thread is not blocked by
+  // a time-consuming task.
+  // If your business logic is fully asynchronous or finished very quickly, you don't
+  // need to specify a group.
+  pipeline.addLast(group, "handler", new MyBusinessLogicHandler());
+```
+
+请注意，在使用 DefaultEventLoopGroup 时将卸载操作 EventLoop ，它仍将以串行方式 ChannelHandlerContext 处理任务，从而保证排序。由于订购，它仍然可能成为一个瓶颈。如果您的用例不需要排序，您可能需要考虑使用 以 UnorderedThreadPoolEventExecutor 最大化任务执行的并行性。
+
+### 线程安全
+
+可以随时添加或删除 ChannelHandler ，因为 是 ChannelPipeline 线程安全的。例如，可以在要交换敏感信息时插入加密处理程序，并在交换后将其删除。
+
+
+
+
+
 ## Bootstrap&&ServerBootstrap
 
 
