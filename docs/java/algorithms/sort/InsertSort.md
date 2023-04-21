@@ -9,6 +9,8 @@
 
 ## 算法实现
 这里算法实现的时候有一个小细节，这个细节很关键就是子循环的时候倒序，因为这实际上就代表了如果新的值是有序区间的最大值就不会继续走循环。用`swap`的写法是这样的：
+
+> SortAlgorithm 实现在排序算法的[README.md](/java/algorithms/sort/README.md)中提供
 ```java
 public class InsertSort implements SortAlgorithm {
     @Override
