@@ -242,7 +242,7 @@ public class NettyEventLoopFactory {
         return new NioEventLoopGroup(threads, threadFactory);
     }
 
-    public static Class<? extends SocketChannel> newSocketChannel() {
+    public static Class<? extends SocketChannel> socketChannelClass() {
         if (epollEnabled) {
             return EpollSocketChannel.class;
         }
@@ -252,7 +252,7 @@ public class NettyEventLoopFactory {
         return NioSocketChannel.class;
     }
 
-    public static Class<? extends ServerSocketChannel> newServerSocketChannel() {
+    public static Class<? extends ServerSocketChannel> serverSocketChannelClass() {
         if (epollEnabled) {
             return EpollServerSocketChannel.class;
         }
