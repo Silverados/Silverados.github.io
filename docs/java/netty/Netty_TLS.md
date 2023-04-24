@@ -1,4 +1,4 @@
-# Netty TLS(Transport Security)
+# Netty TLS(Transport Layer Security)
 
 ## OpenSSL
 这是推荐的方式。以下是官方给出来的优点：
