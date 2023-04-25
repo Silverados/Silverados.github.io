@@ -1,5 +1,4 @@
 import {defineConfig} from 'vitepress'
-base: '/Silverados.github.io/'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({

@@ -39,7 +39,7 @@ Channel可以有父Channel，具体取决于其创建方式。例如，被`Serve
 
 下图描述了ChannelPipeline 通常如何处理 I/O 事件ChannelHandler。I/O 事件由 或 ChannelInboundHandler 处理ChannelOutboundHandler，并通过调用 中ChannelHandlerContext定义的事件传播方法（如 ChannelHandlerContext.fireChannelRead(Object) 和 ChannelHandlerContext.write(Object)）转发到最近的处理程序。
 
-![image-20230411151649907](C:\Users\QTZ\AppData\Roaming\Typora\typora-user-images\image-20230411151649907.png)
+![image-20230411151649907](/_images/image-20230411151649907.png)
 
 
 
