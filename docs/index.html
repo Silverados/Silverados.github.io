@@ -35,7 +35,7 @@
     alias: {
       '/.*/_sidebar.md': '/_sidebar.md',
     },
-
+    routerMode: 'history', // default: 'hash'
     plugins: [
       function (hook, vm) {
         hook.beforeEach(function (html) {
