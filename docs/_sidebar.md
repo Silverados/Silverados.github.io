@@ -12,7 +12,10 @@
         * [Netty案例一 EchoServer](/java/netty/demo/demo1_echo.md "Netty案例一: 回显服务器")
     * [算法](/java/algorithms/README.md "算法 | Silverados")
       * [排序算法](/java/algorithms/sorts/README.md "排序算法 | Silverados")
-          * [插入排序](/java/algorithms/sorts/InsertSort.md "插入算法 | Silverados")
+          * [插入排序](/java/algorithms/sorts/InsertSort.md "插入排序 | Silverados")
+          * [冒泡排序](/java/algorithms/sorts/BubbleSort.md "冒泡排序 | Silverados")
+          * [选择排序](/java/algorithms/sorts/SelectSort.md "选择排序 | Silverados")
+          * [计数排序](/java/algorithms/sorts/CountSort.md "计数排序 | Silverados")
 * AI
     * [IDEA使用AWS CodeWhisperer](/ai/IDEA使用CodeWhisperer.md "IDEA使用AWS CodeWhisperer | Silverados") 
 * 杂项
