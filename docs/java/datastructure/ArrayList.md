@@ -16,9 +16,9 @@ public class ArrayList<E> extends AbstractList<E>
 
 ## 构造方法
 `ArrayList`提供以下几个构造方法：
-- public ArrayList()
-- public ArrayList(int initialCapacity)
-- public ArrayList(Collection<? extends E> c)
+- `public ArrayList()`
+- `public ArrayList(int initialCapacity)`
+- `public ArrayList(Collection<? extends E> c)`
 
 纵观3个构造方法的实现，都是对`elementData`进行赋值，当容量为0时赋予静态的空数组`EMPTY_ELEMENTDATA`，当使用默认的构造方法时使用的也是大小为0的空数组`DEFAULTCAPACITY_EMPTY_ELEMENTDATA`，唯一的区别在于后者在第一次添加元素的时候会用默认的容量进行数组的初始化（有点延迟初始化的概念，如果不添加元素就不会产生新的`Object[]`对象）。：
 ```java

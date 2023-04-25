@@ -15,10 +15,10 @@ public class HashMap<K,V> extends AbstractMap<K,V>
 
 ## 构造方法
 `HashMap`的构造方法如下：
-- public HashMap(int initialCapacity, float loadFactor)
-- public HashMap(int initialCapacity)
-- public HashMap()
-- public HashMap(Map<? extends K, ? extends V> m)
+- `public HashMap(int initialCapacity, float loadFactor)`
+- `public HashMap(int initialCapacity)`
+- `public HashMap()`
+- `public HashMap(Map<? extends K, ? extends V> m)`
 
 分析前3个方法的实现可以发现构造方法主要做的是:对`loadFactor`赋值、对`threshold`赋值。如果没传入值`loadFactor`使用`DEFAULT_LOAD_FACTOR`。
 第4个方法在这个基础上对传入的参数`Map<K, V> m`先设置`loadFactor`为默认值, 然后通常情况下是将`tableSizeFor(m.size / loadFactor + 1)`进行分析得到`threshold`, 例如我m的大小是20，得到的值为32。
