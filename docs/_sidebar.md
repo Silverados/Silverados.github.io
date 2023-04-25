@@ -1,7 +1,8 @@
 * 杂谈
 	* [首页](/ "Silverados的个人博客")
-	* [博客搭建](blog/博客搭建.md "搭建一个博客 | Silverados")
-    * [博客定制化](blog/博客定制化.md "博客定制化 | Silverados")
+	* [博客搭建](blog/Docsify博客搭建.md "搭建一个博客 | Silverados")
+    * [博客定制化](blog/Docsify博客定制化.md "博客定制化 | Silverados")
+    * [博客体验](blog/博客体验.md "博客体验 | Silverados")
 * Java
     * 数据结构
 		* [ArrayList](/java/datastructure/ArrayList.md "ArrayList详解 | Silverados")

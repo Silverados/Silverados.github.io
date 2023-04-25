@@ -1,4 +1,4 @@
-# 博客定制化
+# Docsify博客定制化
 这里讲几个思路:
 1. 直接用文档里的[**定制化**](https://docsify.js.org/#/zh-cn/configuration)，看需要什么就引入什么。这里我给的跳转链接是到配置项的，还有主题、插件列表等，也支持自己开发。
 2. 查看[awesome-docsify](https://docsify.js.org/#/zh-cn/awesome)中其他人的博客，然后按F12查看`index.html`的源码，copy他们的实现。

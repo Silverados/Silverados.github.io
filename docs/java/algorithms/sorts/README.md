@@ -13,17 +13,17 @@
 ## 比较排序
 顾名思义，这类排序都有比较。按时间复杂度划分为：
 - O(n^2):
-  - [选择排序](SelectSort.md)
-  - [插入排序](InsertSort.md)
-  - [冒泡排序](BubbleSort.md)
+  - [选择排序](/java/algorithms/sorts/SelectSort.md)
+  - [插入排序](/java/algorithms/sorts/InsertSort.md)
+  - [冒泡排序](/java/algorithms/sorts/BubbleSort.md)
 - O(nlogN):
-  - [归并排序](MergeSort.md)
-  - [快速排序](QuickSort.md)
-  - [堆排序](HeapSort.md)
+  - [归并排序](/java/algorithms/sorts/MergeSort.md)
+  - [快速排序](/java/algorithms/sorts/QuickSort.md)
+  - [堆排序](/java/algorithms/sorts/HeapSort.md)
 
 ## 非比较排序
 对于没了解过的人会觉得挺不可思议的，排序居然不用比较。
-- [计数排序](CountSort.md)
+- [计数排序](/java/algorithms/sorts/CountSort.md)
 
 ## JDK17中Arrays.sort()
 这里浅浅看一下类库里的`sort`使用的排序算法, 不深入分析。首先看`Arrays.sort()`的几种实现可以发现基本的数值类型`byte, short, int, long, float, double, char`都使用`DualPivotQuickSort`来实现：
