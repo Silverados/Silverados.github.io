@@ -5,8 +5,8 @@ export default defineConfig({
   title: "Silverados",
   description: "Silverados的个人博客",
   lastUpdated: true,
-  head:[
-    ['link', { rel: "icon", type: "image/png", sizes: "32x32", href: "/_media/favicon2.ico"}],
+  head: [
+    ['link', {rel: "icon", type: "image/png", sizes: "32x32", href: "/_media/favicon2.ico"}],
   ],
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
@@ -15,6 +15,9 @@ export default defineConfig({
     sidebar: {
       'java/datastructure': sidebarJavaDataStructure(),
       'java/algorithms': sidebarAlgorithms(),
+      'java/netty': sidebarNetty(),
+      'misc': sidebarMisc(),
+      'blog': sidebarMisc(),
     },
 
     socialLinks: [
@@ -42,9 +45,12 @@ function nav() {
       text: 'Java',
       items: [
         {text: '数据结构', link: '/java/datastructure/ArrayList'},
-        {text: 'Netty', link: '/java/netty/'},
+        {text: 'Netty', link: '/java/netty/Netty性能优化_Native_Transports'},
         {text: '算法', link: '/java/algorithms/README', activeMatch: '/java/algorithms/',}
       ]
+    }, {
+      text: '杂谈',
+      link: '/misc/README'
     }
   ]
 }
@@ -76,3 +82,32 @@ function sidebarAlgorithms() {
 
   ]
 }
+
+function sidebarMisc() {
+  return [
+    {
+      text: '博客搭建',
+      collapsed: false,
+      items: [
+        {text: 'Docsify博客搭建', link: '/blog/Docsify博客搭建.md'},
+        {text: 'Docsify博客定制化', link: '/blog/Docsify博客定制化.md'},
+        {text: '博客体验', link: '/blog/博客体验.md'},
+      ]
+    },
+  ]
+}
+
+function sidebarNetty() {
+  return [
+    {
+      text: 'Netty',
+      collapsed: false,
+      items: [
+        {text: 'Native Transports', link: '/java/netty/Netty性能优化_Native_Transports.md'},
+        {text: 'Netty TLS', link: '/java/netty/Netty_TLS'},
+        {text: 'Netty案例一 EchoServer', link: '/java/netty/demo/demo1_echo'},
+      ]
+    },
+  ]
+}
+
