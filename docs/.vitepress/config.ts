@@ -5,6 +5,9 @@ export default defineConfig({
   title: "Silverados",
   description: "Silverados的个人博客",
   lastUpdated: true,
+  head:[
+    ['link', { rel: "icon", type: "image/png", sizes: "32x32", href: "/_media/favicon2.ico"}],
+  ],
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: nav(),
@@ -19,7 +22,7 @@ export default defineConfig({
     ],
 
     footer: {
-      message: "Thanks to Vuepress."
+      message: "Powered by Vitepress."
     },
 
     editLink: {
