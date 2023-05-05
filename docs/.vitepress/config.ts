@@ -77,6 +77,8 @@ function sidebarAlgorithms() {
         {text: '冒泡排序', link: '/java/algorithms/sorts/BubbleSort'},
         {text: '选择排序', link: '/java/algorithms/sorts/SelectSort'},
         {text: '计数排序', link: '/java/algorithms/sorts/CountSort'},
+        {text: '归并排序', link: '/java/algorithms/sorts/MergeSort'},
+        {text: '快速排序', link: '/java/algorithms/sorts/QuickSort'},
       ]
     },
 
