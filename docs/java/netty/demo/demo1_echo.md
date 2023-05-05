@@ -21,6 +21,13 @@
 
 这里实现`EchoServer`，可以说这个实现就是一个范式:
 ```java
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.handler.ssl.SslContext;
+import silverados.github.io.netty.NettyEventLoopFactory;
+import silverados.github.io.netty.NettySslUtil;
+
 public class EchoServer {
     public static final int PORT = 8888;
 
@@ -48,6 +55,15 @@ public class EchoServer {
 
 接下来实现的是`EchoServerInitializer`, 这个地方因为传来的是字节流首先我们先用`LineBaseFrameDecoder`进行切割, 然后再转为`String`, 最后再对字符串进行处理:
 ```java
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.LineBasedFrameDecoder;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
+import io.netty.handler.ssl.SslContext;
+
+
 public class EchoServerInitializer extends ChannelInitializer<SocketChannel> {
     private SslContext sslContext;
     private static final StringDecoder STRING_DECODER = new StringDecoder();
@@ -76,6 +92,8 @@ public class EchoServerInitializer extends ChannelInitializer<SocketChannel> {
 
 `EchoServerHandler`的实现如下，在接收到`bye`时关闭连接，这里有两个需要注意的地方：一个是注解`Sharable`，另一个是`response`里的加上的`\r\n`。
 ```java
+import io.netty.channel.*;
+
 @ChannelHandler.Sharable
 public class EchoServerHandler extends SimpleChannelInboundHandler<String> {
     @Override
@@ -111,9 +129,21 @@ public class EchoServerHandler extends SimpleChannelInboundHandler<String> {
 ## 实现客户端
 这里从控制台接受输入，需要注意的还是`\r\n`，这个而是我们分隔数据的标识。
 ```java
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.handler.ssl.SslContext;
+import silverados.github.io.netty.NettyEventLoopFactory;
+import silverados.github.io.netty.NettySslUtil;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
 public class EchoClient {
     public static String HOST = "localhost";
-    public static int PORT = TelnetServer.PORT;
+    public static int PORT = EchoServer.PORT;
     public static void main(String[] args) {
         EventLoopGroup group = NettyEventLoopFactory.newEventLoopGroup();
         try {
@@ -156,6 +186,14 @@ public class EchoClient {
 
 这里的`sslContext.newHandler`和服务端的参数有所不同，需要注意。
 ```java
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.LineBasedFrameDecoder;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
+import io.netty.handler.ssl.SslContext;
+
 public class EchoClientInitializer extends ChannelInitializer<SocketChannel> {
 
     private static final StringDecoder STRING_DECODER = new StringDecoder();
@@ -185,6 +223,10 @@ public class EchoClientInitializer extends ChannelInitializer<SocketChannel> {
 
 只是简单的打印出服务端发过来数据。
 ```java
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
+
 @ChannelHandler.Sharable
 public class EchoClientHandler extends SimpleChannelInboundHandler<String> {
     @Override
