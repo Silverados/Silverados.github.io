@@ -6,7 +6,7 @@ export default defineConfig({
   description: "Silverados的个人博客",
   lastUpdated: true,
   head: [
-    ['link', {rel: "icon", type: "image/png", href: "/assets/favicons/favicon2.ico"}],
+    ['link', {rel: "icon", type: "image/png", href: "/public/favicon2.ico"}],
   ],
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
