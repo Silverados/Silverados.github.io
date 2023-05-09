@@ -108,6 +108,7 @@ function sidebarNetty() {
         {text: 'Native Transports', link: '/java/netty/Netty性能优化_Native_Transports.md'},
         {text: 'Netty TLS', link: '/java/netty/Netty_TLS'},
         {text: 'Netty案例一 EchoServer', link: '/java/netty/demo/demo1_echo'},
+        {text: 'Netty ChannelOption', link: '/java/netty/Netty_ChannelOption'},
       ]
     },
   ]
