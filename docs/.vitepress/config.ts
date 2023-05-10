@@ -109,6 +109,7 @@ function sidebarNetty() {
         {text: 'Netty TLS', link: '/java/netty/Netty_TLS'},
         {text: 'Netty案例一 EchoServer', link: '/java/netty/demo/demo1_echo'},
         {text: 'Netty ChannelOption', link: '/java/netty/Netty_ChannelOption'},
+        {text: 'Netty ChannelOption拓展', link: '/java/netty/Netty_ChannelOption_extend'},
       ]
     },
   ]
