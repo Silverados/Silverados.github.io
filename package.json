@@ -1,11 +1,18 @@
 {
-  "devDependencies": {
-    "@jridgewell/sourcemap-codec": "^1.4.15",
-    "vitepress": "^1.0.0-alpha.74"
-  },
   "scripts": {
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.1.0",
+    "@sugarat/theme": "^0.1.20",
+    "element-plus": "^2.3.4",
+    "vue": "^3.2.47"
+  },
+  "devDependencies": {
+    "sass": "^1.59.2",
+    "typescript": "^4.9.5",
+    "vitepress": "1.0.0-alpha.75"
   }
 }
