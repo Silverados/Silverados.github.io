@@ -56,7 +56,13 @@ public class ThreadPoolExecutor extends AbstractExecutorService {}
     }
 ```
 
-这里虽然提供了很多的参数，但是需要了解这些参数的作用需要往下看`ThreadPoolExecutor`的执行策略。
+这里虽然提供了很多的参数，但是需要了解这些参数的作用需要往下看`ThreadPoolExecutor`的执行策略。这里先给一个概述：
+- int corePoolSize: 核心线程池大小
+- int maximumPoolSize: 最大线程池大小
+- long keepAliveTime, TimeUnit unit: 空闲线程最大存活时间
+- ThreadFactory threadFactory: 线程工厂
+- BlockingQueue<Runnable> workQueue: 阻塞队列
+- RejectedExecutionHandler handler: 拒绝策略
 
 ## 线程池的状态和工作线程数量
 在开始看任务执行前，我们需要先看一个原子变量`ctl`，这个变量隐含了两个概念一个是工作线程的数量，另一个是线程池的状态。
@@ -116,8 +122,40 @@ public class ThreadPoolExecutor extends AbstractExecutorService {}
 ```text
 0 ... corePoolSize ... maximumPoolSize
 ```
+边界里的劳工干到死除非有让他停下的理由，边界外的闲了就放假。
+
+当提交一个任务给线程池时，会按以下的逻辑执行：
+1. 如果工作线程数量小于`corePoolSize`，那么核心线程池添加一个工作线程执行任务。
+2. 如果线程池还在运行，那么添加到工作队列。这里会有一个双重检测再判断一次线程池的状态。如果线程池不在运行状态了，从队列移除执行拒绝策略。如果工作线程数量为0那么添加一个到最大线程池。
+3. 如果既无法添加到线程池，又无法添加到队列中，执行拒绝策略。
+
+```java
+    public void execute(Runnable command) {
+        if (command == null)
+            throw new NullPointerException();
+
+        int c = ctl.get();
+        if (workerCountOf(c) < corePoolSize) {
+            if (addWorker(command, true))
+                return;
+            c = ctl.get();
+        }
+        if (isRunning(c) && workQueue.offer(command)) {
+            int recheck = ctl.get();
+            if (! isRunning(recheck) && remove(command))
+                reject(command);
+            else if (workerCountOf(recheck) == 0)
+                addWorker(null, false);
+        }
+        else if (!addWorker(command, false))
+            reject(command);
+    }
+```
 
 
+## 工作者线程
+添加工作者线程有两个参数，第一个`Runnable firstTask`意味着这个线程第一个执行的任务，这个值可能是`null`意味着启动一个工作者线程但是不需要直接执行任务，而是到队列之类的地方拿，后面`getTask`会分析。
+第二个参数意味着这个工作线程是否是添加到核心线程池。前面也说了其实只有一个池子，`corePoolSize`只是相当于中间的边界，从下面方法的实现我们也可以看出来，当`core`为`true`时如果线程数量超过`corePoolSize`则添加失败。
 ```java
     private boolean addWorker(Runnable firstTask, boolean core) {
         retry:
@@ -182,50 +220,205 @@ public class ThreadPoolExecutor extends AbstractExecutorService {}
         return workerStarted;
     }
 ```
+方法的实现中前面标签`retry`部分是判断能不能添加，后面部分是添加的实际过程。
+- 添加一个工作者线程，这个过程会从线程池中创建一个新的线程。
+- 将这个工作线程添加进`HashSet<Worker> workers`中，注意本身`HashSet`是线程不安全的，所以实际上所有对它的操作都在持有锁的情况下进行。
+- 更新`largestPoolSize`。
+- 启动线程。如果失败调用`addWorkerFailed`。
 
-
-1. 如果工作线程数量小于`corePoolSize`，那么核心线程池添加一个工作线程执行任务。
-2. 如果线程池还在运行，那么添加到工作队列。这里会有一个双重检测再判断一次线程池的状态。如果线程池不在运行状态了，从队列移除执行拒绝策略。如果工作线程数量为0那么添加一个到最大线程池。
-3. 如果即无法添加到线程池，又无法添加到队列中，执行拒绝策略。
-
+启动线程实际执行的`run`方法：
 ```java
-    public void execute(Runnable command) {
-        if (command == null)
-            throw new NullPointerException();
-        /*
-         * Proceed in 3 steps:
-         *
-         * 1. If fewer than corePoolSize threads are running, try to
-         * start a new thread with the given command as its first
-         * task.  The call to addWorker atomically checks runState and
-         * workerCount, and so prevents false alarms that would add
-         * threads when it shouldn't, by returning false.
-         *
-         * 2. If a task can be successfully queued, then we still need
-         * to double-check whether we should have added a thread
-         * (because existing ones died since last checking) or that
-         * the pool shut down since entry into this method. So we
-         * recheck state and if necessary roll back the enqueuing if
-         * stopped, or start a new thread if there are none.
-         *
-         * 3. If we cannot queue task, then we try to add a new
-         * thread.  If it fails, we know we are shut down or saturated
-         * and so reject the task.
-         */
-        int c = ctl.get();
-        if (workerCountOf(c) < corePoolSize) {
-            if (addWorker(command, true))
-                return;
-            c = ctl.get();
+    private final class Worker extends AbstractQueuedSynchronizer implements Runnable
+    {
+        Worker(Runnable firstTask) {
+            setState(-1); // inhibit interrupts until runWorker
+            this.firstTask = firstTask;
+            this.thread = getThreadFactory().newThread(this);
         }
-        if (isRunning(c) && workQueue.offer(command)) {
-            int recheck = ctl.get();
-            if (! isRunning(recheck) && remove(command))
-                reject(command);
-            else if (workerCountOf(recheck) == 0)
-                addWorker(null, false);
+        /** Delegates main run loop to outer runWorker. */
+        public void run() {
+            runWorker(this);
         }
-        else if (!addWorker(command, false))
-            reject(command);
     }
 ```
+
+工作者线程不断从队列中(getTask())拿任务来执行。如果发现没有任务了就尝试自我毁灭(processWorkerExit())了。
+工作者线程在执行的时候会先给自己上个排他锁，所以当`worker`是`isLocked`的时候意味着正在执行任务。
+任务的执行分为：`beforeExecute(wt, task);` -> `task.run();` -> `afterExecute(task, ex);`，判断中断线程在`beforeExecute`之前。
+```java
+    final void runWorker(Worker w) {
+        Thread wt = Thread.currentThread();
+        Runnable task = w.firstTask;
+        w.firstTask = null;
+        w.unlock(); // allow interrupts
+        boolean completedAbruptly = true;
+        try {
+            while (task != null || (task = getTask()) != null) {
+                w.lock();
+                // If pool is stopping, ensure thread is interrupted;
+                // if not, ensure thread is not interrupted.  This
+                // requires a recheck in second case to deal with
+                // shutdownNow race while clearing interrupt
+                if ((runStateAtLeast(ctl.get(), STOP) ||
+                     (Thread.interrupted() &&
+                      runStateAtLeast(ctl.get(), STOP))) &&
+                    !wt.isInterrupted())
+                    wt.interrupt();
+                try {
+                    beforeExecute(wt, task);
+                    try {
+                        task.run();
+                        afterExecute(task, null);
+                    } catch (Throwable ex) {
+                        afterExecute(task, ex);
+                        throw ex;
+                    }
+                } finally {
+                    task = null;
+                    w.completedTasks++;
+                    w.unlock();
+                }
+            }
+            completedAbruptly = false;
+        } finally {
+            processWorkerExit(w, completedAbruptly);
+        }
+    }
+```
+
+`getTask`会不断的尝试在队列中拿任务，除非超时或者终止线程池或者队列空了。
+```java
+    private Runnable getTask() {
+        boolean timedOut = false; // Did the last poll() time out?
+
+        for (;;) {
+            int c = ctl.get();
+
+            // Check if queue empty only if necessary.
+            if (runStateAtLeast(c, SHUTDOWN)
+                && (runStateAtLeast(c, STOP) || workQueue.isEmpty())) {
+                decrementWorkerCount();
+                return null;
+            }
+
+            int wc = workerCountOf(c);
+
+            // Are workers subject to culling?
+            boolean timed = allowCoreThreadTimeOut || wc > corePoolSize;
+
+            if ((wc > maximumPoolSize || (timed && timedOut))
+                && (wc > 1 || workQueue.isEmpty())) {
+                if (compareAndDecrementWorkerCount(c))
+                    return null;
+                continue;
+            }
+
+            try {
+                Runnable r = timed ?
+                    workQueue.poll(keepAliveTime, TimeUnit.NANOSECONDS) :
+                    workQueue.take();
+                if (r != null)
+                    return r;
+                timedOut = true;
+            } catch (InterruptedException retry) {
+                timedOut = false;
+            }
+        }
+    }
+```
+
+## 拒绝策略
+当线程池和阻塞队列无法执行任务时，由拒绝策略决定任务何去何从。
+```java
+public interface RejectedExecutionHandler {
+    void rejectedExecution(Runnable r, ThreadPoolExecutor executor);
+}
+```
+
+接口`RejectedExecutionHandler`定义了`rejectedExecution`方法，该方法接受两个参数一个是待执行的任务，另一个是当前线程池。调用的地方在`ThreadPoolExecutor`中的：
+```java
+    final void reject(Runnable command) {
+        handler.rejectedExecution(command, this);
+    }
+```
+
+其中内置了以下几种策略：
+- CallerRunsPolicy: 调用者线程执行
+- AbortPolicy: 抛弃且抛出异常
+- DiscardPolicy: 抛弃无异常
+- DiscardOldestPolicy: 抛弃最老的任务执行当前的任务
+
+### CallerRunsPolicy 调用者线程执行
+如果线程池没有shutdown则执行。
+```java
+    public static class CallerRunsPolicy implements RejectedExecutionHandler {
+        public CallerRunsPolicy() { }
+
+        public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+            if (!e.isShutdown()) {
+                r.run();
+            }
+        }
+    }
+```
+
+### AbortPolicy 抛弃并抛异常策略
+这是默认的执行方式，拒绝执行并抛出一个异常。
+```java
+    public static class AbortPolicy implements RejectedExecutionHandler {
+        public AbortPolicy() { }
+
+        public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+            throw new RejectedExecutionException("Task " + r.toString() +
+                                                 " rejected from " +
+                                                 e.toString());
+        }
+    }
+```
+
+### DiscardPolicy 抛弃不抛异常策略
+抛弃但是不做任何事情。
+```java
+    public static class DiscardPolicy implements RejectedExecutionHandler {
+        public DiscardPolicy() { }
+
+        public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+        }
+    }
+```
+
+### DiscardOldestPolicy 抛弃队列头的任务
+抛弃队列中最老的任务然后执行当前任务。
+```java
+    public static class DiscardOldestPolicy implements RejectedExecutionHandler {
+        public DiscardOldestPolicy() { }
+
+        public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+            if (!e.isShutdown()) {
+                e.getQueue().poll();
+                e.execute(r);
+            }
+        }
+    }
+
+```
+
+这里在Javadoc有提到以下的实现，这个实现优于`DiscardOldestPolicy`，它会触发被抛弃任务的回调或者记录一些额外的信息：
+```java
+     new RejectedExecutionHandler() {
+       public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+         Runnable dropped = e.getQueue().poll();
+         if (dropped instanceof Future<?>) {
+           ((Future<?>)dropped).cancel(false);
+           // also consider logging the failure
+         }
+         e.execute(r);  // retry
+```
+
+## 线程池监控
+- getPoolSize(): 返回当前线程池中的线程数量
+- getActiveCount(): 返回线程池中(大约)活跃线程的数量
+- getLargestPoolSize(): 返回线程池中最多的时候运行的线程数量
+- getTaskCount(): 返回(大约)提交过的任务数量
+- completedTaskCount(): 返回(大约)执行完成的任务数量
+
