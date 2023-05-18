@@ -57,12 +57,12 @@ public class ThreadPoolExecutor extends AbstractExecutorService {}
 ```
 
 这里虽然提供了很多的参数，但是需要了解这些参数的作用需要往下看`ThreadPoolExecutor`的执行策略。这里先给一个概述：
-- int corePoolSize: 核心线程池大小
-- int maximumPoolSize: 最大线程池大小
-- long keepAliveTime, TimeUnit unit: 空闲线程最大存活时间
-- ThreadFactory threadFactory: 线程工厂
-- BlockingQueue<Runnable> workQueue: 阻塞队列
-- RejectedExecutionHandler handler: 拒绝策略
+- `int corePoolSize`: 核心线程池大小
+- `int maximumPoolSize`: 最大线程池大小
+- `long keepAliveTime, TimeUnit unit`: 空闲线程最大存活时间
+- `ThreadFactory threadFactory`: 线程工厂
+- `BlockingQueue<Runnable> workQueue`: 阻塞队列
+- `RejectedExecutionHandler handler`: 拒绝策略
 
 ## 线程池的状态和工作线程数量
 在开始看任务执行前，我们需要先看一个原子变量`ctl`，这个变量隐含了两个概念一个是工作线程的数量，另一个是线程池的状态。
