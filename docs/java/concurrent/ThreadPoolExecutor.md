@@ -72,7 +72,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {}
 - RUNNING(运行中): 接受新任务和处理队列中的任务
 - SHUTDOWN(): 不再接受新任务，但是仍然会执行队列中的任务
 - STOP(停止): 不接受新任务，不执行队列中的任务，中断正在进行的任务
-- TIDYING(清理): 所有任务都执行完成，workerCount为0，线程过渡好`TIDYING`状态执行`terminated()`钩子方法
+- TIDYING(清理): 所有任务都执行完成，workerCount为0，线程过渡为`TIDYING`状态执行`terminated()`钩子方法
 - TERMINATED(): `terminated`已经执行
 
 状态的改变：
