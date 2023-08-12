@@ -122,7 +122,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {}
 ```text
 0 ... corePoolSize ... maximumPoolSize
 ```
-边界里的劳工干到死除非有让他停下的理由，边界外的闲了就放假。
+边界里的劳工干到死除非有让他停下的理由，边界外的闲了一段时间就放假。
 
 当提交一个任务给线程池时，会按以下的逻辑执行：
 1. 如果工作线程数量小于`corePoolSize`，那么核心线程池添加一个工作线程执行任务。
@@ -421,4 +421,43 @@ public interface RejectedExecutionHandler {
 - getLargestPoolSize(): 返回线程池中最多的时候运行的线程数量
 - getTaskCount(): 返回(大约)提交过的任务数量
 - completedTaskCount(): 返回(大约)执行完成的任务数量
+
+## 线程池预热
+- `prestartCoreThread`: 预热一个核心线程
+- `prestartAllCoreThreads`: 预热所有核心线程
+
+## 设置核心线程池数量
+动态设置核心线程数量，如果当前核心线程数大于设置值，那么中断那些空闲的线程。当前核心线程数小于设置值，那么预热差值或队列大小的小值。
+```java
+    public void setCorePoolSize(int corePoolSize) {
+        if (corePoolSize < 0 || maximumPoolSize < corePoolSize)
+            throw new IllegalArgumentException();
+        int delta = corePoolSize - this.corePoolSize;
+        this.corePoolSize = corePoolSize;
+        if (workerCountOf(ctl.get()) > corePoolSize)
+            interruptIdleWorkers();
+        else if (delta > 0) {
+            // We don't really know how many new threads are "needed".
+            // As a heuristic, prestart enough new workers (up to new
+            // core size) to handle the current number of tasks in
+            // queue, but stop if queue becomes empty while doing so.
+            int k = Math.min(delta, workQueue.size());
+            while (k-- > 0 && addWorker(null, true)) {
+                if (workQueue.isEmpty())
+                    break;
+            }
+        }
+    }
+```
+
+## 动态设置最大线程池数量
+```java
+    public void setMaximumPoolSize(int maximumPoolSize) {
+        if (maximumPoolSize <= 0 || maximumPoolSize < corePoolSize)
+            throw new IllegalArgumentException();
+        this.maximumPoolSize = maximumPoolSize;
+        if (workerCountOf(ctl.get()) > maximumPoolSize)
+            interruptIdleWorkers();
+    }
+```
 
