@@ -48,7 +48,7 @@ Netty针对不同的操作系统提供了不同的`JNI`协议, 这些协议相�
 
 ### 前置知识
 - 可以通过`Epoll.isAvailable()`判断`Epoll`是否可用。
-- 可以通过`KQueue.isAvailable()`判断`KQueue``是否可用。
+- 可以通过`KQueue.isAvailable()`判断`KQueue`是否可用。
 
 ### sofa-bolt
 [SOFABolt](https://github.com/sofastack/sofa-bolt) 是蚂蚁金融服务集团开发的一套基于 Netty 实现的网络通信框架。
