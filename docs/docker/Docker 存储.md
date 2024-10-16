@@ -43,24 +43,21 @@ Bind mounts and volumes can both be mounted into containers using the -v or --vo
 
 ### 管理卷
 1. 创建卷:
-```shell
-docker volume create <volume-name>
-```
-
+    ```shell
+    docker volume create volume-name
+    ```
 2. 删除卷
-```shell
-docker volume rm <volume-name>
-```
-
+    ```shell
+    docker volume rm volume-name
+    ```
 3. 查看卷
-```shell
-docker volume ls
-```
-
+    ```shell
+    docker volume ls
+    ```
 4. 查看卷详细信息
-```shell
-docker volume inspect <volume-name>
-```
+    ```shell
+    docker volume inspect volume-name
+    ```
    
 ### 使用docker cli
 如果你用一个还不存在的卷启动一个容器，Docker 会为你创建该卷。下面的示例将卷 myvol2 挂载到容器中的 /app/
