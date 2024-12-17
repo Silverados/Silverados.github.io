@@ -25,6 +25,8 @@ public class Advice {
 ```
 
 - 查看方法执行数据, 只看参数 输出层级3 输出5条 耗时大于0.1ms的:`watch com.qgame.fight.scene.gameobj.component.SkillComponent commonUseSkill '{params}' '#cost>0.1' -n 5  -x 3`
+- `watch com.qgame.fight.scene.gameobj.component.SkillComponent commonUseSkill '{params}' '#cost>0.1' -n 5  -x 3`
+- `watch com.qgame.fight.scene.framework.system.SceneSystem fixedUpdate '{params,returnObj,throwExp}' '#cost>10' -n 5  -x 3`
 ```shell
 Affect(class count: 1 , method count: 1) cost in 77 ms, listenerId: 16
 method=com.qgame.fight.scene.gameobj.component.SkillComponent.commonUseSkill location=AtExit

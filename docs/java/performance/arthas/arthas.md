@@ -14,6 +14,10 @@ java -jar arthas-boot.jar
 java -jar arthas-boot.jar --repo-mirror aliyun --use-http
 ```
 
+## docker容器内
+```shell
+docker exec -it  instance_1-instance-1 /bin/bash -c "curl -O https://arthas.aliyun.com/arthas-boot.jar && java -jar arthas-boot.jar"
+```
 
 ## 表达式核心变量
 
